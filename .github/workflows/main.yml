@@ -25,7 +25,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt  # Install dependencies from requirements.txt
-        pip install flask  # Explicitly install Flask
 
     - name: Lint with flake8
       run: |
@@ -35,7 +34,7 @@ jobs:
     - name: Run Unit Tests if present
       run: |
         pip install pytest  # Install pytest if not installed already
-        pytest src/tests  # Run all tests in the 'src/tests' directory
+        pytest -s src/tests  # Run all tests in the 'src/tests' directory with -s to allow input()
 
     - name: Snyk Dependency Scan
       uses: snyk/actions/python@master
