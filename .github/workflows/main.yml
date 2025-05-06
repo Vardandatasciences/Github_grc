@@ -3,10 +3,10 @@ name: CI Pipeline
 on:
   pull_request:
     branches:
-      - main  # Change 'master' to 'main'
+      - main
   push:
     branches:
-      - main  # Change 'master' to 'main'
+      - main
 
 jobs:
   build:
@@ -16,47 +16,81 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+    # Backend Setup and Testing
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
 
-    - name: Install Dependencies
+    - name: Install Backend Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Install dependencies from requirements.txt
-        pip install dash  # Explicitly install dash package
+        pip install -r backend/requirements.txt  # Install backend dependencies
 
-    - name: Lint with flake8
+    - name: Run Linting for Backend
       run: |
         pip install flake8
-        flake8 src || true  # prevent breaking on lint issues
+        flake8 backend/src || true  # Lint the backend directory
 
+    - name: Run Backend Unit Tests
+      run: |
+        pip install pytest
+        pytest backend/tests  # Run backend unit tests if present
+
+    # Frontend Setup and Testing
+    - name: Set up Node.js for Frontend
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm install  # Install frontend dependencies
+
+    - name: Run Linting for Frontend
+      run: |
+        cd frontend
+        npm run lint  # Lint the frontend code
+
+    - name: Run Frontend Tests
+      run: |
+        cd frontend
+        npm test -- --coverage  # Run frontend tests (use Jest, Mocha, or other tools)
+
+    # Run Application (Backend + Frontend)
     - name: Run App
       run: |
-        echo "Running app.py to show greeting..."
-        python src/app.py
+        # Run backend app
+        echo "Running backend app..."
+        python backend/src/app.py &  # Start the backend server
+        sleep 5  # Wait for backend to start
+        # Optionally, run frontend app too (if using a dev server)
+        echo "Running frontend app..."
+        cd frontend && npm run dev &  # Start frontend server
 
-    - name: Run Unit Tests if present
-      run: |
-        if [ -d "tests" ]; then
-          pip install pytest
-          pytest tests/  # Run all tests in the 'tests' directory
-        else
-          echo "No tests/ directory found. Skipping tests."
-        fi
-
-    - name: Snyk Dependency Scan
+    # Security Scans for Dependencies
+    - name: Run Snyk Dependency Scan (Backend)
       uses: snyk/actions/python@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --file=requirements.txt
+        args: --file=backend/requirements.txt
 
-    - name: Install Snyk CLI for Code Scan
+    - name: Install Snyk CLI for Code Scan (Backend)
       uses: snyk/actions/setup@master
 
-    - name: Run Snyk Code Scan
+    - name: Run Snyk Code Scan (Backend)
       run: snyk code test
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    
+    - name: Run Snyk Dependency Scan (Frontend)
+      run: |
+        cd frontend
+        snyk test  # Run snyk test for frontend
+
+    - name: Run Snyk Code Scan (Frontend)
+      run: |
+        cd frontend
+        snyk code test  # Run snyk code test for frontend
