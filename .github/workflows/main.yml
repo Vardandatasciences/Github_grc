@@ -36,12 +36,10 @@ jobs:
         pip install pytest  # Install pytest if not installed already
         pytest -s src/tests  # Run all tests in the 'src/tests' directory with -s to allow input()
 
-    - name: Snyk Dependency Scan
-      uses: snyk/actions/python@master
+    - name: Run Snyk Code Scan
+      run: snyk code test
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        args: --file=requirements.txt
 
     - name: Install Snyk CLI
       run: |
