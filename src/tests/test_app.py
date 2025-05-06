@@ -1,4 +1,4 @@
-def happy_birthday(suresh):
+def happy_birthday(Suresh):
     print(f"Happy Birthday, {suresh}!\nWishing you a day filled with love, laughter, and joy!")
 
 # Example of how you would test this in a unit test
