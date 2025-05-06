@@ -3,10 +3,10 @@ name: CI Pipeline
 on:
   pull_request:
     branches:
-      - main
+      - master
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -16,81 +16,42 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    # Backend Setup and Testing
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
 
-    - name: Install Backend Dependencies
+    - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r backend/requirements.txt  # Install backend dependencies
+        pip install -r requirements.txt
 
-    - name: Run Linting for Backend
+    - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 backend/src || true  # Lint the backend directory
+        flake8 src || true  # prevent breaking on lint issues
 
-    - name: Run Backend Unit Tests
-      run: |
-        pip install pytest
-        pytest backend/tests  # Run backend unit tests if present
-
-    # Frontend Setup and Testing
-    - name: Set up Node.js for Frontend
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-
-    - name: Install Frontend Dependencies
-      run: |
-        cd frontend
-        npm install  # Install frontend dependencies
-
-    - name: Run Linting for Frontend
-      run: |
-        cd frontend
-        npm run lint  # Lint the frontend code
-
-    - name: Run Frontend Tests
-      run: |
-        cd frontend
-        npm test -- --coverage  # Run frontend tests (use Jest, Mocha, or other tools)
-
-    # Run Application (Backend + Frontend)
     - name: Run App
       run: |
-        # Run backend app
-        echo "Running backend app..."
-        python backend/src/app.py &  # Start the backend server
-        sleep 5  # Wait for backend to start
-        # Optionally, run frontend app too (if using a dev server)
-        echo "Running frontend app..."
-        cd frontend && npm run dev &  # Start frontend server
+        echo "Running app.py to show greeting..."
+        python src/app.py
 
-    # Security Scans for Dependencies
-    - name: Run Snyk Dependency Scan (Backend)
+    - name: Run Unit Tests in `src` Directory
+      run: |
+        pip install pytest  # Install pytest for testing
+        pytest src  # Run all tests in the 'src' directory
+
+    - name: Snyk Dependency Scan
       uses: snyk/actions/python@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --file=backend/requirements.txt
+        args: --file=requirements.txt
 
-    - name: Install Snyk CLI for Code Scan (Backend)
+    - name: Install Snyk CLI for Code Scan
       uses: snyk/actions/setup@master
 
-    - name: Run Snyk Code Scan (Backend)
+    - name: Run Snyk Code Scan
       run: snyk code test
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-    
-    - name: Run Snyk Dependency Scan (Frontend)
-      run: |
-        cd frontend
-        snyk test  # Run snyk test for frontend
-
-    - name: Run Snyk Code Scan (Frontend)
-      run: |
-        cd frontend
-        snyk code test  # Run snyk code test for frontend
