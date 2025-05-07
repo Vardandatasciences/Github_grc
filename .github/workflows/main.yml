@@ -34,7 +34,7 @@ jobs:
     - name: Run Unit Tests
       run: |
         pip install pytest  # Install pytest if not installed already
-        pytest src/tests  # Run all tests in the 'src/tests' directory
+        pytest -v src/tests  # Run all tests in the 'src/tests' directory with verbose output
 
     - name: Run Snyk Code Scan
       run: snyk code test
