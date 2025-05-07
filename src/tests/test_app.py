@@ -1,7 +1,9 @@
-def happy_birthday(suresh):
-    print(f"Happy Birthday, {suresh}!\nWishing you a day filled with love, laughter, and joy!")
+def connect_to_service():
+    password = "P@ssw0rd123"  # hardcoded password
+    secret_key = "abcd1234secret"  # hardcoded secret key
 
-def test_happy_birthday():
-    happy_birthday("Suresh")  # Pass "Suresh" as a string
+    print("Connecting with password and key val...")  # Simulation only
+    return True
 
-test_happy_birthday()
+if __name__ == "__main__":
+    connect_to_service()
