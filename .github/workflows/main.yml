@@ -24,7 +24,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r src/requirements.txt  # Updated path to 'requirements.txt' in 'src' folder
+        pip install -r src/requirements.txt  # Corrected the path to the requirements.txt file in 'src' folder
 
     - name: Lint with flake8
       run: |
@@ -46,7 +46,7 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --file=src/requirements.txt  # Correct path to 'requirements.txt'
+        args: --file=src/requirements.txt  # Corrected path to 'requirements.txt'
 
     - name: Install Snyk CLI for Code Scan
       uses: snyk/actions/setup@master
