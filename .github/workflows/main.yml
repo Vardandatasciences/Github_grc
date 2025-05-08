@@ -24,44 +24,34 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r src/requirements.txt  # Install dependencies from the requirements.txt
+        pip install -r backend/requirements.txt  # Correct path to 'requirements.txt' under 'backend'
 
-    # Linting Step: Flake8 for Python
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 src || true  # Lint the 'src' directory
+        flake8 src || true  # prevent breaking on lint issues
 
-    # Unit Test Step: Running tests using pytest
-    - name: Run Unit Tests
+    - name: Run App
       run: |
-        pip install pytest  # Install pytest if not already installed
-        pytest src/tests/test_app.py  # Run unit tests located in 'src/tests/test_app.py'
+        echo "Running app.py to show greeting..."
+        python src/app.py
 
-    # Dependency Scan: Snyk
-    - name: Run Snyk Dependency Scan
+    - name: Run Unit Tests if present
+      run: |
+        pip install pytest  # Install pytest
+        pytest src  # Run all tests directly from the 'src' folder
+
+    - name: Snyk Dependency Scan
       uses: snyk/actions/python@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --file=src/requirements.txt  # Perform a dependency vulnerability scan based on 'requirements.txt'
+        args: --file=backend/requirements.txt  # Correct path to 'requirements.txt'
 
-    # Install and Configure Snyk CLI for Code Analysis
     - name: Install Snyk CLI for Code Scan
       uses: snyk/actions/setup@master
 
     - name: Run Snyk Code Scan
-      run: snyk code test  # Run Snyk static code analysis
+      run: snyk code test
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-    # Automatic Build Process (Simulate)
-    - name: Build Backend
-      run: |
-        echo "Building backend..."
-        # Add any backend-specific build steps here, if necessary (e.g., packaging or testing)
-
-    - name: Build Frontend (if any)
-      run: |
-        echo "Building frontend..."
-        # You can also add any frontend build steps if applicable (e.g., npm build for React app)
