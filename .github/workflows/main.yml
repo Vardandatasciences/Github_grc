@@ -24,7 +24,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r backend/requirements.txt  # Correct path to 'requirements.txt' under 'backend'
+        pip install -r src/requirements.txt  # Updated path to 'requirements.txt' in 'src' folder
 
     - name: Lint with flake8
       run: |
@@ -39,14 +39,14 @@ jobs:
     - name: Run Unit Tests if present
       run: |
         pip install pytest  # Install pytest
-        pytest src  # Run all tests directly from the 'src' folder
+        pytest src/tests  # Run all tests directly from the 'src/tests' folder
 
     - name: Snyk Dependency Scan
       uses: snyk/actions/python@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --file=backend/requirements.txt  # Correct path to 'requirements.txt'
+        args: --file=src/requirements.txt  # Correct path to 'requirements.txt'
 
     - name: Install Snyk CLI for Code Scan
       uses: snyk/actions/setup@master
