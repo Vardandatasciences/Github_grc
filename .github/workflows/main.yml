@@ -24,29 +24,44 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r src/requirements.txt  # Install dependencies from requirements.txt
+        pip install -r src/requirements.txt  # Install dependencies from the requirements.txt
 
+    # Linting Step: Flake8 for Python
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 src || true  # Prevent breaking on lint issues
+        flake8 src || true  # Lint the 'src' directory
 
+    # Unit Test Step: Running tests using pytest
     - name: Run Unit Tests
       run: |
-        pip install pytest  # Install pytest if not installed already
-        pytest -v src  # Run all tests in the 'src' directory with verbose output
+        pip install pytest  # Install pytest if not already installed
+        pytest src/tests/test_app.py  # Run unit tests located in 'src/tests/test_app.py'
+
+    # Dependency Scan: Snyk
+    - name: Run Snyk Dependency Scan
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --file=src/requirements.txt  # Perform a dependency vulnerability scan based on 'requirements.txt'
+
+    # Install and Configure Snyk CLI for Code Analysis
+    - name: Install Snyk CLI for Code Scan
+      uses: snyk/actions/setup@master
 
     - name: Run Snyk Code Scan
-      run: snyk code test
+      run: snyk code test  # Run Snyk static code analysis
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
-    - name: Install Snyk CLI
+    # Automatic Build Process (Simulate)
+    - name: Build Backend
       run: |
-        npm install -g snyk
-        snyk auth ${{ secrets.SNYK_TOKEN }}  # Authenticate with your token
+        echo "Building backend..."
+        # Add any backend-specific build steps here, if necessary (e.g., packaging or testing)
 
-    - name: Run Snyk Code Scan
-      run: snyk code test
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    - name: Build Frontend (if any)
+      run: |
+        echo "Building frontend..."
+        # You can also add any frontend build steps if applicable (e.g., npm build for React app)
