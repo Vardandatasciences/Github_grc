@@ -1,0 +1,58 @@
+name: Continuous Integration Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+
+jobs:
+
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Use system Node.js
+        run: node -v  # Optional: just prints the current Node version used by the runner
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm run test
+
+
+  lint:
+    name: Run Linter
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: src
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Use system Node.js
+        run: node -v  # Optional: just prints the current Node version used by the runner
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Linter
+        run: npm run lint
