@@ -30,4 +30,9 @@ jobs:
 
       - name: Run tests with pytest
         run: |
-          pytest tests/--maxfail=1 --disable-warnings -v   # Specify the directory containing your tests
+          if [ -d tests ]; then
+            pytest tests/ --maxfail=1 --disable-warnings -v
+          else
+            echo "No tests directory found."
+            exit 1
+          fi
