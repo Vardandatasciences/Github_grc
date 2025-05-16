@@ -3,7 +3,7 @@ name: Continuous Integration Workflow
 on:
   pull_request:
     branches:
-      - 
+      - main
     paths:
       - 'src/**'
   push:
