@@ -1,3 +1,4 @@
+pytest
 requests
 pytest
 flask_cors
