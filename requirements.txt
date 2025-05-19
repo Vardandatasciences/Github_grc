@@ -2,3 +2,4 @@ requests
 pytest
 flask_cors
 flask
+flake8
