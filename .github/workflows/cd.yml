@@ -1,0 +1,52 @@
+name: Continuous Deployment (CD)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    outputs:
+      public_ip: ${{ steps.tf_output.outputs.public_ip }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init infra/
+
+      - name: Terraform Plan
+        run: terraform plan infra/
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve infra/
+
+      - name: Get Terraform Output
+        id: tf_output
+        run: |
+          echo "public_ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
+
+  ansible:
+    runs-on: ubuntu-latest
+    needs: terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Ansible
+        run: sudo apt update && sudo apt install -y ansible
+
+      - name: Generate Dynamic Inventory
+        run: |
+          echo "[web]" > inventory.ini
+          echo "${{ needs.terraform.outputs.public_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook -i inventory.ini config/site.yml
